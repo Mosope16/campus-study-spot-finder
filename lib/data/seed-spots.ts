@@ -140,7 +140,7 @@ export const INITIAL_STUDY_SPOTS: StudySpot[] = [
     total_reports_count: 28,
     amenities: ['outlets_plenty', 'ergonomic_chairs', 'natural_light', 'wifi_fast'],
     images: [
-      'https://images.unsplash.com/photo-1507842229451-79b1be886a20?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=80'
     ],
     hours: { open: '08:00', close: '21:00', is_24_7: false },

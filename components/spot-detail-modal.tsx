@@ -87,6 +87,7 @@ export default function SpotDetailModal({
             src={spot.images[activeImageIndex] || spot.images[0]}
             alt={spot.name}
             fill
+            sizes="(max-width: 768px) 100vw, 768px"
             priority
             className="object-cover"
           />

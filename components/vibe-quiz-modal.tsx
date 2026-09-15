@@ -260,7 +260,13 @@ export default function VibeQuizModal({
               {/* Matched Spot Card */}
               <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 text-left bg-slate-50 dark:bg-slate-900/80 shadow-xl">
                 <div className="relative h-44 w-full">
-                  <Image src={matchedSpot.images[0]} alt={matchedSpot.name} fill className="object-cover" />
+                  <Image
+                    src={matchedSpot.images[0]}
+                    alt={matchedSpot.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 500px"
+                    className="object-cover"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
                   <div className="absolute bottom-3 left-3 right-3 text-white">
                     <div className="text-xs text-indigo-300 font-semibold">{matchedSpot.building}</div>
