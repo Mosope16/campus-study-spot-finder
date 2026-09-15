@@ -45,10 +45,10 @@ export default function CampusMap({
         attributionControl: false
       });
 
-      // Add CartoDB Dark Matter / Positron tiles for a clean, modern aesthetic
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      // OpenStreetMap Humanitarian tiles — 100% free, zero watermark, zero API key required
+      L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        subdomains: 'abcd'
+        subdomains: ['a', 'b', 'c']
       }).addTo(map);
 
       // Re-position zoom controls to bottom-right
