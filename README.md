@@ -8,23 +8,26 @@ A modern, full-stack, mobile-first web app to help university students discover,
 
 ## 🚀 Key Features
 
-- **🗺️ Interactive Campus Map**: Custom Leaflet map with color-coded status pins showing real-time busyness and noise levels across campus.
+- **🗺️ Interactive Campus Map**: Custom Leaflet map with zero-watermark OpenStreetMap tiles, status pins, quick campus zone jumps (*North Quad, Central Stacks, South Quad*), and a "Locate Me" geolocation finder.
+- **🪑 Interactive Seating & Outlet Floor Map**: View a live desk schematic inside each spot showing window seats, Herman Miller chairs, open vs occupied desks, and dedicated 120V power outlets.
+- **⏱️ Study Session Focus Timer (Pomodoro)**: Launch a 25-minute deep focus sprint or 5-minute break with live progress bar and completion celebration.
+- **⚡ Live Campus Pulse Ticker**: Real-time status ticker broadcasting available seats, open silent sanctums, and active study hubs across campus.
 - **🤫 Deep Noise & Vibe Filtering**:
   - *Dead Silent* (pin-drop quiet carrels)
   - *Quiet Murmur* (gentle page turns)
   - *Moderate Buzz* (coffeehouse energy)
   - *Collaborative* (group whiteboard brainstorming)
-- **⚡ Live "Crowd Intel" & Check-In**: Real-time busyness meters (🟢 Lots of Seats, 🟡 Half Full, 🟠 Busy, 🔴 Packed) with student check-in voting and anti-spam cooldowns.
+- **⚡ Live "Crowd Intel" & Check-In**: Real-time busyness meters (🟢 Lots of Seats, 🟡 Half Full, 🟠 Busy, 🔴 Packed) with student check-in voting.
 - **🎯 "Find My Vibe" 3-Step Matcher**: Interactive quiz that scores and recommends the single best spot for your current mood, battery level, and study mission.
 - **🔌 Amenity Filters**: Filter by outlet density, Gigabit Wi-Fi, natural daylight, 24/7 access, rolling whiteboards, dual USB-C monitors, and cafes.
 - **📍 Detailed Spot Profiles**:
   - Photo galleries
   - Floor-by-floor directions ("Take elevator to 3rd floor past physics lab")
   - Insider tips from fellow students
-  - Operating hours & late-night status
+  - Operating hours & custom submission controls
   - Student reviews and rating breakdown
-- **➕ Community Submissions**: Add new study spots with building, floor, noise level, and amenity tags.
-- **📱 Fully Responsive & PWA Ready**: Mobile bottom navigation bar, split desktop view, and home-screen installable.
+- **➕ Community Submissions**: Add new study spots with custom operating hours, 24/7 toggle, and photo presets.
+- **📱 PWA Ready with Service Worker**: Native home-screen installation with offline caching and responsive bottom navigation.
 
 ---
 

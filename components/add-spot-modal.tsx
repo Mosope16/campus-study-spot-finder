@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { StudySpot, NoiseLevel, BusynessLevel, Amenity } from '@/lib/types';
-import { AMENITIES_LIST, NOISE_LEVEL_META, BUSYNESS_META } from '@/lib/constants';
-import { X, Plus, Image as ImageIcon, MapPin, Sparkles } from 'lucide-react';
+import { AMENITIES_LIST } from '@/lib/constants';
+import { X, Plus, Clock } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface AddSpotModalProps {
@@ -238,6 +238,48 @@ export default function AddSpotModal({ onClose, onAddSpot }: AddSpotModalProps) 
                 <option value="busy">🟠 Usually Busy</option>
               </select>
             </div>
+          </div>
+
+          {/* Operating Hours */}
+          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                <Clock className="w-3.5 h-3.5 text-indigo-500" />
+                <span>Operating Hours</span>
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={is247}
+                  onChange={(e) => setIs247(e.target.checked)}
+                  className="rounded text-indigo-600 focus:ring-indigo-500"
+                />
+                <span>Open 24/7</span>
+              </label>
+            </div>
+
+            {!is247 && (
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label className="text-[11px] text-slate-500 dark:text-slate-400 block mb-0.5">Opening Time</label>
+                  <input
+                    type="time"
+                    value={openTime}
+                    onChange={(e) => setOpenTime(e.target.value)}
+                    className="w-full px-2.5 py-1.5 text-xs rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] text-slate-500 dark:text-slate-400 block mb-0.5">Closing Time</label>
+                  <input
+                    type="time"
+                    value={closeTime}
+                    onChange={(e) => setCloseTime(e.target.value)}
+                    className="w-full px-2.5 py-1.5 text-xs rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Amenities Selector */}

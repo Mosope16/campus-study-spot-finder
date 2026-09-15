@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { StudySpot } from '@/lib/types';
 import { NOISE_LEVEL_META, BUSYNESS_META } from '@/lib/constants';
+import { Crosshair } from 'lucide-react';
 
 interface CampusMapProps {
   spots: StudySpot[];
@@ -11,6 +12,13 @@ interface CampusMapProps {
   center?: [number, number];
   zoom?: number;
 }
+
+const CAMPUS_ZONES = [
+  { label: 'All Campus', coords: [37.8724, -122.2585] as [number, number], zoom: 15 },
+  { label: 'North Quad', coords: [37.8745, -122.2580] as [number, number], zoom: 17 },
+  { label: 'Central Stacks', coords: [37.8726, -122.2600] as [number, number], zoom: 17 },
+  { label: 'South Quad', coords: [37.8695, -122.2565] as [number, number], zoom: 17 },
+];
 
 export default function CampusMap({
   spots,
@@ -22,79 +30,12 @@ export default function CampusMap({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<{ [id: string]: any }>({});
+  const userMarkerRef = useRef<any>(null);
+  const [activeZone, setActiveZone] = useState('All Campus');
+  const [locating, setLocating] = useState(false);
 
-  useEffect(() => {
-    if (!mapContainerRef.current) return;
-    let isMounted = true;
-
-    // Dynamically load Leaflet on the client to avoid SSR issues
-    import('leaflet').then((L) => {
-      if (!isMounted || !mapContainerRef.current) return;
-
-      // Clean up previous instance if exists
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
-
-      // Initialize map
-      const map = L.map(mapContainerRef.current, {
-        center,
-        zoom,
-        zoomControl: false,
-        attributionControl: false
-      });
-
-      // OpenStreetMap Humanitarian tiles — 100% free, zero watermark, zero API key required
-      L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        subdomains: ['a', 'b', 'c']
-      }).addTo(map);
-
-      // Re-position zoom controls to bottom-right
-      L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-      mapInstanceRef.current = map;
-
-      // Populate markers
-      renderMarkers(L, map, spots, selectedSpotId);
-    });
-
-    return () => {
-      isMounted = false;
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
-    };
-  }, []);
-
-  // Update markers when spots or selectedSpotId change
-  useEffect(() => {
-    if (!mapInstanceRef.current) return;
-    import('leaflet').then((L) => {
-      renderMarkers(L, mapInstanceRef.current, spots, selectedSpotId);
-    });
-  }, [spots, selectedSpotId]);
-
-  // Pan to selected spot if changed
-  useEffect(() => {
-    if (!mapInstanceRef.current || !selectedSpotId) return;
-    const selected = spots.find((s) => s.id === selectedSpotId);
-    if (selected) {
-      mapInstanceRef.current.flyTo([selected.lat, selected.lng], 17, {
-        duration: 0.8,
-        easeLinearity: 0.25
-      });
-      // Open popup if marker exists
-      if (markersRef.current[selectedSpotId]) {
-        markersRef.current[selectedSpotId].openPopup();
-      }
-    }
-  }, [selectedSpotId]);
-
-  const renderMarkers = (L: any, map: any, spotList: StudySpot[], activeId: string | null) => {
-    // Clear existing markers
+  // Helper to render pins
+  const updateMarkers = (L: any, map: any, spotList: StudySpot[], activeId: string | null) => {
     Object.values(markersRef.current).forEach((marker) => marker.remove());
     markersRef.current = {};
 
@@ -103,7 +44,6 @@ export default function CampusMap({
       const noiseMeta = NOISE_LEVEL_META[spot.noise_level];
       const busynessMeta = BUSYNESS_META[spot.busyness];
 
-      // Custom HTML Pin icon
       const pinHtml = `
         <div class="custom-pin-container group" style="transform: ${isSelected ? 'scale(1.2) translateY(-4px)' : 'scale(1)'}">
           <div class="pulse-ring" style="background-color: ${busynessMeta.color};"></div>
@@ -126,7 +66,6 @@ export default function CampusMap({
 
       const marker = L.marker([spot.lat, spot.lng], { icon: customIcon }).addTo(map);
 
-      // Popup Content
       const popupHtml = `
         <div style="width: 220px; font-family: system-ui, sans-serif; overflow: hidden; border-radius: 10px;">
           <div style="height: 90px; background-image: url('${spot.images[0]}'); background-size: cover; background-position: center; position: relative;">
@@ -168,24 +107,151 @@ export default function CampusMap({
     });
   };
 
+  useEffect(() => {
+    if (!mapContainerRef.current) return;
+    let isMounted = true;
+
+    import('leaflet').then((L) => {
+      if (!isMounted || !mapContainerRef.current) return;
+
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+
+      const map = L.map(mapContainerRef.current, {
+        center,
+        zoom,
+        zoomControl: false,
+        attributionControl: false
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        subdomains: ['a', 'b', 'c']
+      }).addTo(map);
+
+      L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+      mapInstanceRef.current = map;
+      updateMarkers(L, map, spots, selectedSpotId);
+    });
+
+    return () => {
+      isMounted = false;
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+    import('leaflet').then((L) => {
+      updateMarkers(L, mapInstanceRef.current, spots, selectedSpotId);
+    });
+  }, [spots, selectedSpotId]);
+
+  useEffect(() => {
+    if (!mapInstanceRef.current || !selectedSpotId) return;
+    const selected = spots.find((s) => s.id === selectedSpotId);
+    if (selected) {
+      mapInstanceRef.current.flyTo([selected.lat, selected.lng], 17, {
+        duration: 0.8,
+        easeLinearity: 0.25
+      });
+      if (markersRef.current[selectedSpotId]) {
+        markersRef.current[selectedSpotId].openPopup();
+      }
+    }
+  }, [selectedSpotId, spots]);
+
+  const handleZoneJump = (zone: typeof CAMPUS_ZONES[0]) => {
+    setActiveZone(zone.label);
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.flyTo(zone.coords, zone.zoom, { duration: 0.8 });
+    }
+  };
+
+  const handleLocateMe = () => {
+    if (!navigator.geolocation || !mapInstanceRef.current) return;
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocating(false);
+        const { latitude, longitude } = pos.coords;
+        import('leaflet').then((L) => {
+          if (userMarkerRef.current) userMarkerRef.current.remove();
+          const userIcon = L.divIcon({
+            html: `<div style="width:16px;height:16px;border-radius:9999px;background:#38bdf8;border:3px solid white;box-shadow:0 0 12px #38bdf8;"></div>`,
+            className: 'user-pin',
+            iconSize: [16, 16],
+            iconAnchor: [8, 8]
+          });
+          userMarkerRef.current = L.marker([latitude, longitude], { icon: userIcon }).addTo(mapInstanceRef.current);
+          mapInstanceRef.current.flyTo([latitude, longitude], 17);
+        });
+      },
+      () => {
+        setLocating(false);
+        // Default to campus center
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.flyTo(center, 16);
+        }
+      },
+      { timeout: 6000 }
+    );
+  };
+
   return (
-    <div className="relative w-full h-full min-h-[350px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-card bg-slate-900">
-      <div ref={mapContainerRef} className="w-full h-full" />
-      
-      {/* Map Floating Legend */}
-      <div className="absolute top-4 left-4 z-[400] glass-panel px-3 py-2 rounded-xl shadow-lg flex items-center gap-3 text-xs">
-        <span className="font-semibold text-slate-700 dark:text-slate-300">Live Crowd:</span>
+    <div className="relative w-full h-full min-h-[350px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-card bg-slate-900 flex flex-col">
+      {/* Top Map Action Bar: Campus Zones & Locate Me */}
+      <div className="absolute top-3 left-3 right-3 z-[400] flex items-center justify-between gap-2 pointer-events-none">
+        {/* Quick Campus Zones */}
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-1 rounded-xl glass-panel pointer-events-auto shadow-md">
+          {CAMPUS_ZONES.map((zone) => (
+            <button
+              key={zone.label}
+              onClick={() => handleZoneJump(zone)}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all ${
+                activeZone === zone.label
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-white'
+              }`}
+            >
+              {zone.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Locate Me Button */}
+        <button
+          onClick={handleLocateMe}
+          disabled={locating}
+          className="p-2 rounded-xl glass-panel text-slate-700 dark:text-slate-200 hover:text-indigo-500 pointer-events-auto shadow-md transition-all active:scale-95"
+          title="Locate Me on Campus"
+        >
+          <Crosshair className={`w-4 h-4 ${locating ? 'animate-spin text-indigo-500' : ''}`} />
+        </button>
+      </div>
+
+      <div ref={mapContainerRef} className="w-full h-full flex-1" />
+
+      {/* Bottom Floating Legend */}
+      <div className="absolute bottom-4 left-4 z-[400] glass-panel px-3 py-1.5 rounded-xl shadow-lg flex items-center gap-3 text-[11px]">
+        <span className="font-semibold text-slate-700 dark:text-slate-300">Live Status:</span>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="text-slate-600 dark:text-slate-400">Empty</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+          <span className="w-2 h-2 rounded-full bg-amber-500" />
           <span className="text-slate-600 dark:text-slate-400">Moderate</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-          <span className="text-slate-600 dark:text-slate-400">Packed</span>
+          <span className="w-2 h-2 rounded-full bg-rose-500" />
+          <span className="text-slate-600 dark:text-slate-400">Full</span>
         </div>
       </div>
     </div>

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { StudySpot } from '@/lib/types';
 import { NOISE_LEVEL_META, BUSYNESS_META } from '@/lib/constants';
-import { X, Sparkles, ArrowRight, Check, Compass, Star, MapPin } from 'lucide-react';
+import { X, Sparkles, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface VibeQuizModalProps {

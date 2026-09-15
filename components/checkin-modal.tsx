@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { StudySpot, BusynessLevel, NoiseLevel } from '@/lib/types';
-import { BUSYNESS_META, NOISE_LEVEL_META } from '@/lib/constants';
-import { X, CheckCircle2, Zap, Users } from 'lucide-react';
+import { BUSYNESS_META } from '@/lib/constants';
+import { X, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface CheckInModalProps {

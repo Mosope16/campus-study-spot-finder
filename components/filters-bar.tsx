@@ -1,9 +1,8 @@
 'use client';
 
 import React from 'react';
-import { FilterState, NoiseLevel, Amenity, BusynessLevel } from '@/lib/types';
-import { AMENITIES_LIST, NOISE_LEVEL_META } from '@/lib/constants';
-import { SlidersHorizontal, Map, LayoutGrid, Columns, RotateCcw } from 'lucide-react';
+import { FilterState, NoiseLevel, Amenity } from '@/lib/types';
+import { Map, LayoutGrid, Columns, RotateCcw } from 'lucide-react';
 
 interface FiltersBarProps {
   filters: FilterState;

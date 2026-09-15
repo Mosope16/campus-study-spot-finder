@@ -16,8 +16,10 @@ import {
   Lightbulb,
   MessageSquarePlus,
   Send,
-  Sparkles
+  Sparkles,
+  Timer
 } from 'lucide-react';
+import SeatingFloorMap from './seating-floor-map';
 
 interface SpotDetailModalProps {
   spot: StudySpot;
@@ -27,6 +29,7 @@ interface SpotDetailModalProps {
   onOpenCheckIn: () => void;
   onAddReview: (review: Omit<Review, 'id' | 'spot_id' | 'created_at'>) => void;
   onFocusMap: () => void;
+  onStartTimer?: () => void;
 }
 
 export default function SpotDetailModal({
@@ -36,7 +39,8 @@ export default function SpotDetailModal({
   onToggleFavorite,
   onOpenCheckIn,
   onAddReview,
-  onFocusMap
+  onFocusMap,
+  onStartTimer
 }: SpotDetailModalProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [copied, setCopied] = useState(false);
@@ -190,7 +194,17 @@ export default function SpotDetailModal({
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              {onStartTimer && (
+                <button
+                  onClick={onStartTimer}
+                  className="px-3 py-2 rounded-xl text-xs font-semibold border border-indigo-500/40 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 transition-all flex items-center gap-1.5"
+                >
+                  <Timer className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Start Focus Sprint</span>
+                </button>
+              )}
+
               <button
                 onClick={onFocusMap}
                 className="px-3 py-2 rounded-xl text-xs font-semibold border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-1.5"
@@ -234,6 +248,9 @@ export default function SpotDetailModal({
               <span>{spot.directions}</span>
             </div>
           </div>
+
+          {/* Interactive Desk & Outlets Floor Schematic */}
+          <SeatingFloorMap spot={spot} />
 
           {/* Amenities Grid */}
           <div className="space-y-3">
@@ -321,23 +338,36 @@ export default function SpotDetailModal({
 
                   <div>
                     <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 block mb-1">
-                      Rating (1 to 5 stars)
+                      Rating & Noise Feel
                     </label>
-                    <div className="flex items-center gap-2">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          onClick={() => setNewRating(star)}
-                          className="p-1 text-slate-400 hover:text-amber-400"
-                        >
-                          <Star
-                            className={`w-5 h-5 ${
-                              newRating >= star ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-700'
-                            }`}
-                          />
-                        </button>
-                      ))}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => setNewRating(star)}
+                            className="p-0.5 text-slate-400 hover:text-amber-400"
+                          >
+                            <Star
+                              className={`w-4 h-4 ${
+                                newRating >= star ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-700'
+                              }`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                      <select
+                        value={newNoise}
+                        onChange={(e) => setNewNoise(e.target.value as any)}
+                        aria-label="Noise level"
+                        className="px-2 py-1 text-xs rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white"
+                      >
+                        <option value="dead_silent">🤫 Dead Silent</option>
+                        <option value="quiet">📚 Quiet</option>
+                        <option value="moderate">☕ Moderate</option>
+                        <option value="collaborative">👥 Collab</option>
+                      </select>
                     </div>
                   </div>
                 </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Sparkles, MapPin, Plus, Heart, Compass, Search } from 'lucide-react';
+import { Sparkles, Plus, Heart, Compass, Search } from 'lucide-react';
 
 interface NavbarProps {
   searchQuery: string;
