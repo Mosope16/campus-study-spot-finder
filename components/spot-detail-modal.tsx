@@ -177,7 +177,7 @@ export default function SpotDetailModal({
                   Live Crowd Status: <span style={{ color: busynessMeta.color }}>{busynessMeta.label}</span>
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-500 dark:text-slate-400" suppressHydrationWarning>
                 Busyness Index: {spot.busyness_score}% • Reported{' '}
                 {spot.last_reported_minutes_ago === 0 ? 'just now' : `${spot.last_reported_minutes_ago} mins ago`} by{' '}
                 {spot.total_reports_count} students

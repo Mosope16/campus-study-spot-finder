@@ -84,7 +84,7 @@ export default function SpotCard({
             />
             <span>{busynessMeta.label}</span>
           </div>
-          <span className="text-[10px] text-slate-300">
+          <span className="text-[10px] text-slate-300" suppressHydrationWarning>
             {spot.last_reported_minutes_ago === 0 ? 'Just now' : `${spot.last_reported_minutes_ago}m ago`}
           </span>
         </div>

@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { StudySpot, FilterState, Review, BusynessLevel, NoiseLevel } from '@/lib/types';
+import { INITIAL_STUDY_SPOTS } from '@/lib/data/seed-spots';
 import {
   getStoredSpots,
   getFavoriteSpotIds,
@@ -43,15 +44,24 @@ const CampusMap = dynamic(() => import('@/components/map/campus-map'), {
 });
 
 export default function StudySpotDashboard() {
-  const [spots, setSpots] = useState<StudySpot[]>(() => getStoredSpots());
-  const [favorites, setFavorites] = useState<string[]>(() => getFavoriteSpotIds());
-  const [selectedSpotId, setSelectedSpotId] = useState<string | null>(() => {
-    const s = getStoredSpots();
-    return s.length > 0 ? s[0].id : null;
-  });
+  const [spots, setSpots] = useState<StudySpot[]>(INITIAL_STUDY_SPOTS);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [selectedSpotId, setSelectedSpotId] = useState<string | null>(
+    INITIAL_STUDY_SPOTS[0]?.id || null
+  );
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const [layoutMode, setLayoutMode] = useState<'split' | 'map' | 'cards'>('split');
   const [mobileTab, setMobileTab] = useState<'cards' | 'map'>('cards');
+
+  // Load from localStorage on client mount (avoids hydration mismatch)
+  useEffect(() => {
+    const stored = getStoredSpots();
+    setSpots(stored);
+    setFavorites(getFavoriteSpotIds());
+    if (stored.length > 0) {
+      setSelectedSpotId(stored[0].id);
+    }
+  }, []);
 
   // Modals & Extras state
   const [activeModal, setActiveModal] = useState<'detail' | 'checkin' | 'quiz' | 'add' | null>(null);
