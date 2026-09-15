@@ -1,0 +1,17 @@
+{
+  "name": "Campus Study Spot Finder",
+  "short_name": "StudySpots",
+  "description": "Discover the quietest libraries, best outlets, and live crowd levels across campus.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#090d16",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
