@@ -2,7 +2,6 @@
 
 A modern, full-stack, mobile-first web app to help university students discover, filter, and review the best study spots across campus. Never wander around looking for an open seat or power outlet again.
 
-![Campus Study Spot Finder Preview](./public/preview.png)
 
 ---
 
