@@ -331,10 +331,11 @@ export default function StudySpotDashboard() {
 
               {filteredSpots.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {filteredSpots.map((spot) => (
+                  {filteredSpots.map((spot, index) => (
                     <SpotCard
                       key={spot.id}
                       spot={spot}
+                      priority={index < 2}
                       isSelected={selectedSpotId === spot.id}
                       isFavorite={favorites.includes(spot.id)}
                       onSelect={() => handleSpotCardClick(spot)}

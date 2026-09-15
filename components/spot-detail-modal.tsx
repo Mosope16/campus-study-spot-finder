@@ -146,7 +146,7 @@ export default function SpotDetailModal({
                     activeImageIndex === idx ? 'border-indigo-400 scale-105' : 'border-white/50 opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <Image src={img} alt="thumb" fill className="object-cover" />
+                  <Image src={img} alt="thumb" fill sizes="48px" className="object-cover" />
                 </button>
               ))}
             </div>

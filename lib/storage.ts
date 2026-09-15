@@ -1,19 +1,45 @@
 import { StudySpot, CheckIn, Review, BusynessLevel, NoiseLevel } from './types';
 import { INITIAL_STUDY_SPOTS } from './data/seed-spots';
 
-const SPOTS_STORAGE_KEY = 'campus_study_spots_data_v1';
-const FAVORITES_STORAGE_KEY = 'campus_study_spots_favorites_v1';
-const CHECKINS_STORAGE_KEY = 'campus_study_spots_checkins_v1';
+const SPOTS_STORAGE_KEY = 'campus_study_spots_data_v3';
+const FAVORITES_STORAGE_KEY = 'campus_study_spots_favorites_v3';
+const CHECKINS_STORAGE_KEY = 'campus_study_spots_checkins_v3';
 
 export function getStoredSpots(): StudySpot[] {
   if (typeof window === 'undefined') return INITIAL_STUDY_SPOTS;
   try {
-    const raw = localStorage.getItem(SPOTS_STORAGE_KEY);
+    let raw = localStorage.getItem(SPOTS_STORAGE_KEY);
+    // Backward compatibility migration from v2 or v1
+    if (!raw) {
+      const oldRaw = localStorage.getItem('campus_study_spots_data_v2') || localStorage.getItem('campus_study_spots_data');
+      if (oldRaw) {
+        raw = oldRaw;
+      }
+    }
+
     if (!raw) {
       localStorage.setItem(SPOTS_STORAGE_KEY, JSON.stringify(INITIAL_STUDY_SPOTS));
       return INITIAL_STUDY_SPOTS;
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    let changed = false;
+    // Sanitize any stale broken image URLs that were cached in browser localStorage
+    const sanitized = parsed.map((s: StudySpot) => ({
+      ...s,
+      images: s.images.map((img) => {
+        if (img.includes('1507842229451')) {
+          changed = true;
+          return 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&q=80';
+        }
+        return img;
+      })
+    }));
+
+    // Always persist cleanly under the current v3 key
+    if (changed || !localStorage.getItem(SPOTS_STORAGE_KEY)) {
+      localStorage.setItem(SPOTS_STORAGE_KEY, JSON.stringify(sanitized));
+    }
+    return sanitized;
   } catch {
     return INITIAL_STUDY_SPOTS;
   }

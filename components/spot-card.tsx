@@ -10,6 +10,7 @@ interface SpotCardProps {
   spot: StudySpot;
   isSelected: boolean;
   isFavorite: boolean;
+  priority?: boolean;
   onSelect: (spot: StudySpot) => void;
   onToggleFavorite: (e: React.MouseEvent, spotId: string) => void;
   onOpenCheckIn: (e: React.MouseEvent, spot: StudySpot) => void;
@@ -20,11 +21,18 @@ export default function SpotCard({
   spot,
   isSelected,
   isFavorite,
+  priority = false,
   onSelect,
   onToggleFavorite,
   onOpenCheckIn,
   onFocusOnMap
 }: SpotCardProps) {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const noiseMeta = NOISE_LEVEL_META[spot.noise_level];
   const busynessMeta = BUSYNESS_META[spot.busyness];
 
@@ -54,6 +62,7 @@ export default function SpotCard({
           src={spot.images[0]}
           alt={spot.name}
           fill
+          priority={priority}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
@@ -85,7 +94,9 @@ export default function SpotCard({
             <span>{busynessMeta.label}</span>
           </div>
           <span className="text-[10px] text-slate-300" suppressHydrationWarning>
-            {spot.last_reported_minutes_ago === 0 ? 'Just now' : `${spot.last_reported_minutes_ago}m ago`}
+            {mounted && spot.last_reported_minutes_ago === 0
+              ? 'Just now'
+              : `${spot.last_reported_minutes_ago}m ago`}
           </span>
         </div>
 
